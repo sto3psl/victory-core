@@ -1,6 +1,6 @@
 import React from "react";
 import VictoryAnimation from "../victory-animation/victory-animation";
-import { Transitions, Collection } from "../victory-util/index";
+import { Transitions, Collection, Timer } from "../victory-util/index";
 import { assign, defaults, isFunction, pick, identity, isEqual } from "lodash";
 
 export default class VictoryTransition extends React.Component {
@@ -11,6 +11,23 @@ export default class VictoryTransition extends React.Component {
     children: React.PropTypes.node,
     animationWhitelist: React.PropTypes.array
   };
+
+  static contextTypes = {
+    getTimer: React.PropTypes.func
+  };
+
+  static childContextTypes = {
+    getTimer: React.PropTypes.func
+  };
+
+  getTimer() {
+    if (isFunction(this.context.getTimer)) {
+      this.timer = this.context.getTimer();
+    } else if(!this.timer) {
+      this.timer = new Timer();
+    }
+    return this.timer;
+  }
 
   constructor(props) {
     super(props);
@@ -23,10 +40,24 @@ export default class VictoryTransition extends React.Component {
     const child = this.props.children;
     this.continuous = child.type && child.type.continuous;
     this.getTransitionState = this.getTransitionState.bind(this);
+    this.getTimer = this.getTimer.bind(this);
+  }
+
+  getChildContext() {
+    return {
+      getTimer: this.getTimer
+    };
   }
 
   componentWillReceiveProps(nextProps) {
+    //this.timer && this.timer.bypassAnimation();
     this.setState(this.getTransitionState(this.props, nextProps));
+  }
+
+  componentWillUnmount() {
+    if (!this.context.getTimer) {
+      this.timer.stop();
+    }
   }
 
   // TODO: This method is expensive, but also prevents unnecessary animations
@@ -85,6 +116,10 @@ export default class VictoryTransition extends React.Component {
       const onEnd = nextProps && nextProps.animate && nextProps.animate.onEnd || identity;
       onEnd();
     }
+  }
+
+  componentWillMount() {
+    this.timer = this.getTimer();
   }
 
   componentDidMount() {
