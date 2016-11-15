@@ -51,7 +51,7 @@ export default class VictoryTransition extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     // this.timer && this.timer.bypassAnimation();
-    this.setState({...this.getTransitionState(this.props, nextProps), nextProps});
+    this.setState(this.getTransitionState(this.props, nextProps));
   }
 
   componentWillUnmount() {
@@ -159,7 +159,8 @@ export default class VictoryTransition extends React.Component {
         nodesShouldLoad: nodesShouldLoad || this.state.nodesShouldLoad,
         nodesDoneLoad: nodesDoneLoad || this.state.nodesDoneLoad,
         animating: animating || this.state.animating,
-        oldProps: nodesWillExit && !nodesDoneClipPathExit ? props : null
+        oldProps: nodesWillExit && !nodesDoneClipPathExit ? props : null,
+        nextProps
       };
       return this.continuous ? assign(
         {
@@ -202,7 +203,7 @@ export default class VictoryTransition extends React.Component {
       return this.state.oldProps || this.props;
     }
     const {nodesDoneClipPathExit, nextProps, oldProps} = this.state;
-    return nodesDoneClipPathExit ? nextProps : oldProps;
+    return nodesDoneClipPathExit ? nextProps || this.props : oldProps || this.props;
   }
 
   pickDomainProps(props) {

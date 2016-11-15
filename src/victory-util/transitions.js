@@ -362,7 +362,7 @@ export function getTransitionPropsFactory(props, state, setState) {
     const animate = child.props.animate;
     const defaultTransitions = child.type && child.type.defaultTransitions;
     if (defaultTransitions) {
-      const animationDuration = animate[type] && animate[type].duration;
+      const animationDuration = animate && animate[type] && animate[type].duration;
       return animationDuration !== undefined ?
         animationDuration : defaultTransitions[type] && defaultTransitions[type].duration;
     }
