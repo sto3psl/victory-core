@@ -136,39 +136,39 @@ function getInitialChildProps(animate, data) {
 }
 
 function getChildBeforeLoad(animate, child, data, cb) { // eslint-disable-line max-params
-  const before = animate.onLoad && animate.onLoad.before ? animate.onLoad.before : identity;
-  const beforeClipPathWidth = animate.onLoad && animate.onLoad.beforeClipPathWidth;
-  // If nodes need to exit, transform them with the provided onLoad.before function.
-  data = data.map((datum) => {
-    return assign({}, datum, before(datum));
-  });
+  // const before = animate.onLoad && animate.onLoad.before ? animate.onLoad.before : identity;
+  // const beforeClipPathWidth = animate.onLoad && animate.onLoad.beforeClipPathWidth;
+  // // If nodes need to exit, transform them with the provided onLoad.before function.
+  // data = data.map((datum) => {
+  //   return assign({}, datum, before(datum));
+  // });
 
-  if (beforeClipPathWidth) {
-    const { clipWidth, translateX } = beforeClipPathWidth(data, child, animate);
-    return { animate, data, clipWidth, translateX, cb};
-  }
+  // if (beforeClipPathWidth) {
+  //   const { clipWidth, translateX } = beforeClipPathWidth(data, child, animate);
+  //   return { animate, data, clipWidth, translateX, cb};
+  // }
 
   return { animate, data, cb};
 }
 
 function getChildOnLoad(animate, data, cb) { // eslint-disable-line max-params
-  animate = assign({}, animate, { onEnd: cb });
-  const after = animate.onLoad && animate.onLoad.after ? animate.onLoad.after : identity;
-  // If nodes need to exit, transform them with the provided onLoad.after function.
-  data = data.map((datum) => {
-    return assign({}, datum, after(datum));
-  });
+  // animate = assign({}, animate, { onEnd: cb });
+  // const after = animate.onLoad && animate.onLoad.after ? animate.onLoad.after : identity;
+  // // If nodes need to exit, transform them with the provided onLoad.after function.
+  // data = data.map((datum) => {
+  //   return assign({}, datum, after(datum));
+  // });
 
   return { animate, data };
 }
 
 function getChildClipPathToLoad(animate, child, data, cb) { // eslint-disable-line max-params, max-len
-  animate = assign({}, animate, { onEnd: cb });
-  const afterClipPathWidth = animate.onLoad && animate.onLoad.afterClipPathWidth;
-  if (afterClipPathWidth) {
-    const { clipWidth, translateX } = afterClipPathWidth(data, child, animate);
-    return { animate, clipWidth, translateX};
-  }
+  // animate = assign({}, animate, { onEnd: cb });
+  // const afterClipPathWidth = animate.onLoad && animate.onLoad.afterClipPathWidth;
+  // if (afterClipPathWidth) {
+  //   const { clipWidth, translateX } = afterClipPathWidth(data, child, animate);
+  //   return { animate, clipWidth, translateX};
+  // }
 
   return { animate };
 }

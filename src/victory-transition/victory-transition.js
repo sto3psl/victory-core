@@ -23,7 +23,7 @@ export default class VictoryTransition extends React.Component {
   getTimer() {
     if (isFunction(this.context.getTimer)) {
       this.timer = this.context.getTimer();
-    } else if(!this.timer) {
+    } else if (!this.timer) {
       this.timer = new Timer();
     }
     return this.timer;
@@ -50,8 +50,8 @@ export default class VictoryTransition extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    //this.timer && this.timer.bypassAnimation();
-    this.setState(this.getTransitionState(this.props, nextProps));
+    // this.timer && this.timer.bypassAnimation();
+    this.setState({...this.getTransitionState(this.props, nextProps), nextProps});
   }
 
   componentWillUnmount() {
@@ -195,9 +195,25 @@ export default class VictoryTransition extends React.Component {
     }
   }
 
+  pickProps() {
+    if (!this.state || !this.state.nodesWillExit) {
+      return this.props;
+    } else if (!this.continuous) {
+      return this.state.oldProps || this.props;
+    }
+    const {nodesDoneClipPathExit, nextProps, oldProps} = this.state;
+    return nodesDoneClipPathExit ? nextProps : oldProps;
+  }
+
+  pickDomainProps(props) {
+    if (!this.continuous || !this.state) {
+      return props;
+    }
+    return this.state.nodesDoneClipPathExit ? this.state.oldProps : this.props;
+  }
+
   render() {
-    const props = this.state && this.state.nodesWillExit && !this.state.nodesDoneClipPathExit ?
-      this.state.oldProps || this.props : this.props;
+    const props = this.pickProps();
     const getTransitionProps = this.props.animate && this.props.animate.getTransitions ?
       this.props.animate.getTransitions :
       Transitions.getTransitionPropsFactory(
@@ -209,7 +225,7 @@ export default class VictoryTransition extends React.Component {
     const transitionProps = getTransitionProps(child);
     this.transitionProps = transitionProps;
     const domain = {
-      x: this.getDomainFromChildren(props, "x"),
+      x: this.getDomainFromChildren(this.pickDomainProps(props), "x"),
       y: this.getDomainFromChildren(props, "y")
     };
     const combinedProps = defaults(
@@ -223,7 +239,7 @@ export default class VictoryTransition extends React.Component {
       <VictoryAnimation {...combinedProps.animate} data={propsToAnimate}>
         {(newProps) => {
           if (this.continuous) {
-            const { clipWidth, clipHeight, translateX, padding } = newProps;
+            const { clipWidth, clipHeight, translateX, padding } = propsToAnimate;
             const groupComponent = React.cloneElement(
               child.props.groupComponent,
               { clipWidth, clipHeight, translateX, padding }
