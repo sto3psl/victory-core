@@ -17,9 +17,11 @@ export default class Timer {
   }
 
   loop() {
-    this.subscribers.forEach((s) => {
-      s.callback(now() - s.startTime);
-    });
+    if (this.shouldAnimate) {
+      this.subscribers.forEach((s) => {
+        s.callback(now() - s.startTime, s.duration);
+      });
+    }
   }
 
   start() {
@@ -31,16 +33,12 @@ export default class Timer {
   }
 
   subscribe(callback, duration) {
-    if (this.shouldAnimate) {
-      return this.subscribers.push({
-        startTime: now(),
-        callback,
-        duration
-      });
-    }
-
-    callback(duration);
-    return null;
+    duration = this.shouldAnimate ? duration : 0;
+    return this.subscribers.push({
+      startTime: now(),
+      callback,
+      duration
+    });
   }
 
   unsubscribe(id) {

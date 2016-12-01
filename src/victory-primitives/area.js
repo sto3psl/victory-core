@@ -1,5 +1,6 @@
 import React, { PropTypes } from "react";
 import { assign } from "lodash";
+import Equality from "../victory-util/equality";
 import * as d3Shape from "d3-shape";
 
 export default class Area extends React.Component {
@@ -75,6 +76,20 @@ export default class Area extends React.Component {
         {...events}
       />
     );
+  }
+
+  shouldComponentUpdate(nextProps) {
+    const simpleProps = ["interpolation", "shapeRendering", "role"];
+    if (!Equality.isShallowEqual(this.props, nextProps, simpleProps)) {
+      return true;
+    } else if (!Equality.isShallowEqual(this.props.style, nextProps.style)) {
+      return true;
+    } else if (this.getAreaPath(this.props) !== this.getAreaPath(nextProps)) {
+      return true;
+    } else if (this.getLinePath(this.props) !== this.getLinePath(nextProps)) {
+      return true;
+    }
+    return false;
   }
 
   render() {

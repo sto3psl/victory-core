@@ -1,5 +1,6 @@
 import React, { PropTypes } from "react";
 import { assign } from "lodash";
+import Equality from "../victory-util/equality";
 import * as d3Shape from "d3-shape";
 
 export default class Curve extends React.Component {
@@ -35,15 +36,32 @@ export default class Curve extends React.Component {
     );
   }
 
-  render() {
-    const { data, events, interpolation, scale, style } = this.props;
+  getLinePath(props) {
+    const { data, interpolation, scale } = props;
     const xScale = scale.x;
     const yScale = scale.y;
     const lineFunction = d3Shape.line()
       .curve(d3Shape[this.toNewName(interpolation)])
       .x((d) => xScale(d.x1 || d.x))
       .y((d) => yScale(d.y1 || d.y));
+    return lineFunction(data);
+  }
+
+  shouldComponentUpdate(nextProps) {
+    const simpleProps = ["interpolation", "shapeRendering", "role"];
+    if (!Equality.isShallowEqual(this.props, nextProps, simpleProps)) {
+      return true;
+    } else if (!Equality.isShallowEqual(this.props.style, nextProps.style)) {
+      return true;
+    } else if (this.getLinePath(this.props) !== this.getLinePath(nextProps)) {
+      return true;
+    }
+    return false;
+  }
+
+  render() {
+    const { style, events } = this.props;
     const lineStyle = assign({fill: "none", stroke: "black"}, style);
-    return this.renderLine(lineFunction(data), lineStyle, events);
+    return this.renderLine(this.getLinePath(this.props), lineStyle, events);
   }
 }

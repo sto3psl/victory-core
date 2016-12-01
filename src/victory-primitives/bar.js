@@ -1,4 +1,5 @@
 import React, { PropTypes } from "react";
+import Equality from "../victory-util/equality";
 import { assign } from "lodash";
 
 export default class Bar extends React.Component {
@@ -43,7 +44,9 @@ export default class Bar extends React.Component {
       L ${y0}, ${x - size}`;
   }
 
-  getBarPath(props, width) {
+  getBarPath(props) {
+     // TODO better bar width calculation
+    const width = this.getBarWidth(props);
     return this.props.horizontal ?
       this.getHorizontalBarPath(props, width) : this.getVerticalBarPath(props, width);
   }
@@ -69,11 +72,22 @@ export default class Bar extends React.Component {
     );
   }
 
+  shouldComponentUpdate(nextProps) {
+    const simpleProps = ["shapeRendering", "role", "x", "y", "y0", "width", "horizontal"];
+    if (!Equality.isShallowEqual(this.props, nextProps, simpleProps)) {
+      return true;
+    } else if (!Equality.isShallowEqual(this.props.style, nextProps.style)) {
+      return true;
+    } else if (!Equality.isShallowEqual(this.props.datum, nextProps.datum)) {
+      return true;
+    } else if (this.getBarPath(this.props) !== this.getBarPath(nextProps)) {
+      return true;
+    }
+    return false;
+  }
+
   render() {
-    // TODO better bar width calculation
-    const barWidth = this.getBarWidth(this.props);
-    const path = typeof this.props.x === "number" ?
-      this.getBarPath(this.props, barWidth) : undefined;
+    const path = typeof this.props.x === "number" ? this.getBarPath(this.props) : undefined;
     const style = assign({fill: "black", stroke: "none"}, this.props.style);
     return this.renderBar(path, style, this.props.events);
   }

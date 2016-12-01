@@ -1,5 +1,7 @@
 import React, { PropTypes } from "react";
 import { assign } from "lodash";
+import Equality from "../victory-util/equality";
+
 
 export default class Line extends React.Component {
   static propTypes = {
@@ -29,6 +31,16 @@ export default class Line extends React.Component {
         {...events}
       />
     );
+  }
+
+  shouldComponentUpdate(nextProps) {
+    const simpleProps = ["shapeRendering", "role", "x1", "y1", "x2", "y2"];
+    if (!Equality.isShallowEqual(this.props, nextProps, simpleProps)) {
+      return true;
+    } else if (!Equality.isShallowEqual(this.props.style, nextProps.style)) {
+      return true;
+    }
+    return false;
   }
 
   render() {
