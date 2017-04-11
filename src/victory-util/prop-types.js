@@ -1,6 +1,6 @@
 /* global console */
 import { isFunction, find } from "lodash";
-import { PropTypes } from "react";
+import PropTypes from "prop-types";
 
 /**
  * Return a new validator based on `validator` but with the option to chain
